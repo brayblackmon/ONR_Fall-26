@@ -62,6 +62,16 @@ Implemented in [sound_manager_gui.py](sound_manager_gui.py), importing `load_sou
   - `add_sound` / `edit_selected_sound` / `delete_selected_sound`, each mirroring the CLI's rules: blank-name rejection, duplicate-name rejection (case-insensitive), immediate `save_sounds` after every change, and a `messagebox` error if the save fails.
   - `on_exit` — saves before closing; if the save fails, asks the user whether to exit anyway.
 
+## Step 6: Add a Play button
+
+A **Play** button was added to `gui.py`'s toolbar, next to Add/Edit/Delete/Refresh:
+
+- Enabled/disabled together with Edit and Delete based on Treeview selection (`update_button_states`).
+- `play_selected_sound` reads the selected row's `file_path`, resolves it relative to the CSV's directory if it isn't absolute, and opens it with the OS default handler: `os.startfile` on Windows, `open` (via `subprocess.Popen`) on macOS, `xdg-open` on Linux.
+- Guards against a blank `file_path` (warning) and a missing file on disk (error), mirroring the `messagebox` error style used elsewhere in the GUI.
+- Sets the status bar to `Playing: <name>` on success.
+- No timeline, volume slider, or other transport controls were added — playback is a single fire-and-forget action handed off to the OS's default player, matching the scope of this step.
+
 ## Current Project State
 
 ```
@@ -76,6 +86,6 @@ Both interfaces read and write the same `sounds.csv`, using the same validation 
 
 - Search/filter box above the Treeview to hide non-matching rows.
 - Click-to-sort on Treeview column headers.
-- A **Play** button that opens the selected sound's `file_path` with the OS default handler (`os.startfile` on Windows).
+- Playback controls beyond the basic Play button: a timeline/seek bar, a volume slider, pause/stop.
 - Drag-and-drop a file onto the File Path field.
 - Automated tests for the shared data layer (`load_sounds`/`save_sounds`/`find_sound_by_name`) so both UIs stay verified against the same behavior.

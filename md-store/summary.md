@@ -61,13 +61,20 @@ This project evolved from a simple command-line sound manager into a single cons
 - `__pycache__/` was later removed from source control and added to
   `.gitignore` so compiled bytecode doesn't get committed.
 
+### 8. Play Button
+- Added a **Play** button to `gui.py`'s toolbar, enabled only when a row is selected.
+- `play_selected_sound` opens the selected sound's `file_path` with the OS default handler (`os.startfile` on Windows, `open` on macOS, `xdg-open` on Linux), resolving relative paths against the CSV's directory.
+- Handles a blank `file_path` and a missing file with `messagebox` warnings/errors; updates the status bar on success.
+- No timeline, volume slider, or other transport controls were added — that's left for a later step.
+
 ## Current State
 The project is a single Tkinter desktop app split across two files:
 `sound_manager.py` (CSV data layer + entry point) and `gui.py`
 (`SoundManagerApp`, `SoundDialog`). Both share the same `sounds.csv` and the
 same validation rules (no blank names, no duplicate names, case-insensitive
-matching). The app is functional and ready for further expansion, such as
-search/filter tools, playback support, or stronger file validation.
+matching). The app now has basic playback via a Play button in addition to
+Add/Edit/Delete/Refresh, and is ready for further expansion, such as
+search/filter tools, richer playback controls, or stronger file validation.
 
 ## Relevant Files
 - `sound_project_plan.md`

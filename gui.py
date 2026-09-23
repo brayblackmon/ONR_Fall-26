@@ -2,6 +2,8 @@
 """Tkinter GUI for the sound list manager."""
 
 import os
+import subprocess
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from typing import Dict, List, Optional
@@ -112,7 +114,10 @@ class SoundManagerApp(tk.Tk):
         self.delete_button.pack(side="left", padx=(0, 5))
 
         self.refresh_button = ttk.Button(toolbar, text="Refresh", command=self.refresh_table)
-        self.refresh_button.pack(side="left")
+        self.refresh_button.pack(side="left", padx=(0, 5))
+
+        self.play_button = ttk.Button(toolbar, text="Play", command=self.play_selected_sound)
+        self.play_button.pack(side="left")
 
         self.table = ttk.Treeview(self, columns=("name", "description", "file_path"), show="headings")
         self.table.heading("name", text="Name")
@@ -136,6 +141,7 @@ class SoundManagerApp(tk.Tk):
         has_selection = bool(selection)
         self.edit_button.state(["!disabled"] if has_selection else ["disabled"])
         self.delete_button.state(["!disabled"] if has_selection else ["disabled"])
+        self.play_button.state(["!disabled"] if has_selection else ["disabled"])
 
     def load_sounds(self):
         try:
@@ -230,6 +236,37 @@ class SoundManagerApp(tk.Tk):
             self.status_var.set(f"Deleted sound: {target['name']}")
         except OSError as exc:
             messagebox.showerror("Save Failed", f"Could not save sound list: {exc}")
+
+    def play_selected_sound(self):
+        selection = self.table.selection()
+        if not selection:
+            return
+
+        row_index = self.table.index(selection[0])
+        sound = self.sounds[row_index]
+        file_path = sound.get("file_path", "").strip()
+
+        if not file_path:
+            messagebox.showwarning("No File Path", f"'{sound['name']}' has no file path set.")
+            return
+
+        if not os.path.isabs(file_path):
+            file_path = os.path.join(os.path.dirname(self.csv_path), file_path)
+
+        if not os.path.isfile(file_path):
+            messagebox.showerror("File Not Found", f"Could not find audio file:\n{file_path}")
+            return
+
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(file_path)
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", file_path])
+            else:
+                subprocess.Popen(["xdg-open", file_path])
+            self.status_var.set(f"Playing: {sound['name']}")
+        except OSError as exc:
+            messagebox.showerror("Playback Failed", f"Could not play '{sound['name']}': {exc}")
 
     def on_exit(self):
         try:
