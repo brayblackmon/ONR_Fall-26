@@ -46,12 +46,32 @@ This project evolved from a simple command-line sound manager into a single cons
 - Verified that the Python files compile successfully using `python -m py_compile`.
 - Confirmed the code parses correctly after the interface rewrite.
 
+### 7. Restructuring ("Restructuring Python logic")
+- Renamed `sound_manager_gui.py` to `gui.py`.
+- `sound_manager.py` was cut down from the CLI+data-layer version to just the
+  shared CSV data layer (`ensure_csv`, `load_sounds`, `save_sounds`,
+  `find_sound_by_name`, `find_sound_index`) plus a `main()` entry point that
+  imports `SoundManagerApp` from `gui.py` and launches it. The old CLI menu
+  loop (`print_menu`, `display_sounds`, `add_sound`/`edit_sound`/
+  `delete_sound`, etc.) was deleted outright rather than left commented out.
+- `gui.py` now imports `find_sound_by_name`, `load_sounds`, `save_sounds`
+  directly from `sound_manager.py`, unchanged in behavior from step 4.
+- Net effect: `python sound_manager.py` is the single entry point and always
+  launches the Tkinter GUI; there is no interactive CLI path anymore.
+- `__pycache__/` was later removed from source control and added to
+  `.gitignore` so compiled bytecode doesn't get committed.
+
 ## Current State
-The project now reflects a single, unified GUI-oriented plan and implementation path using Tkinter, with the CSV backend shared across the sound manager. The app is functional and ready for further expansion, such as search/filter tools, playback support, or stronger file validation.
+The project is a single Tkinter desktop app split across two files:
+`sound_manager.py` (CSV data layer + entry point) and `gui.py`
+(`SoundManagerApp`, `SoundDialog`). Both share the same `sounds.csv` and the
+same validation rules (no blank names, no duplicate names, case-insensitive
+matching). The app is functional and ready for further expansion, such as
+search/filter tools, playback support, or stronger file validation.
 
 ## Relevant Files
-- `sound_project_plan.gui`
+- `sound_project_plan.md`
 - `sound_manager.py`
-- `sound_manager_gui.py`
+- `gui.py`
 - `sounds.csv`
 - `summary.md`
