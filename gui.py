@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Simple Tkinter GUI for the sound list manager."""
+"""Tkinter GUI for the sound list manager."""
 
 import os
-import sys
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 from typing import Dict, List, Optional
 
-from sound_manager import load_sounds, save_sounds, find_sound_by_name
+from sound_manager import find_sound_by_name, load_sounds, save_sounds
 
 
 class SoundDialog(tk.Toplevel):
@@ -239,9 +238,3 @@ class SoundManagerApp(tk.Tk):
         except OSError as exc:
             if messagebox.askyesno("Save Failed", f"Could not save before exit: {exc}\n\nExit anyway?"):
                 self.destroy()
-
-
-if __name__ == "__main__":
-    app = SoundManagerApp()
-    app.protocol("WM_DELETE_WINDOW", app.on_exit)
-    app.mainloop()
